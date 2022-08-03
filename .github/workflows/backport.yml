@@ -54,10 +54,12 @@ jobs:
       - uses: tibdex/backport@v2
         with:
           github_token: ${{ secrets.PAT }}
-          title_template: "<%= title %> [backport <%= number %> to <%= base %>]"
+          title_template: "<%= title %> [backport #<%= number %> to <%= base %>]"
           labels_template: '["backport"]'
           body_template: >
             Backport <%= mergeCommitSha %> from #<%= number %>.
+
             ---
+
             <%= body %>
 
