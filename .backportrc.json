@@ -1,3 +1,6 @@
 {
-  "prTitle": "{commitMessages} [{targetBranch}]"
+  "prTitle": "{commitMessages} [backport: {targetBranch}]",
+  "prDescription": "{defaultPrDescription}\n\n--- BEGIN COMMIT MESSAGE ---\nBackport to {targetBranch}\n{commitMessages}",
+  "sourcePRLabels": ["was-backported"],
+  "targetPRLabels": ["backport"]
 }
