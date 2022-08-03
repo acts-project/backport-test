@@ -55,7 +55,7 @@ jobs:
         with:
           github_token: ${{ secrets.PAT }}
           title_template: "<%= title %> [backport <%= number %> to <%= base %>]"
-          labels_template: "backport"
+          labels_template: '["backport"]'
           body_template: >
             Backport <%= mergeCommitSha %> from #<%= number %>.
             ---
