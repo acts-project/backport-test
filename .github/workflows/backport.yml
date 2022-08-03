@@ -1,29 +1,63 @@
+# on:
+#   pull_request_target:
+#     types: ["labeled", "closed"]
+# 
+# jobs:
+#   backport:
+#     name: Backport PR
+#     runs-on: ubuntu-latest
+#     if: |
+#       github.event.pull_request.merged == true
+#       && contains(github.event.pull_request.labels.*.name, 'auto-backport')
+#       && (
+#         (github.event.action == 'labeled' && github.event.label.name == 'auto-backport')
+#         || (github.event.action == 'closed')
+#       )
+#     steps:
+#       - name: Backport Action
+#         uses: sqren/backport-github-action@v8.9.2
+#         with:
+#           github_token: ${{ secrets.PAT }}
+#           auto_backport_label_prefix: backport-to-
+# 
+#       - name: Info log
+#         if: ${{ success() }}
+#         run: cat /home/runner/.backport/backport.info.log
+#         
+#       - name: Debug log
+#         if: ${{ failure() }}
+#         run: cat /home/runner/.backport/backport.debug.log        
+
+name: Backport
 on:
   pull_request_target:
-    types: ["labeled", "closed"]
+    types:
+      - closed
+      - labeled
 
 jobs:
   backport:
-    name: Backport PR
+    name: Backport
     runs-on: ubuntu-latest
-    if: |
-      github.event.pull_request.merged == true
-      && contains(github.event.pull_request.labels.*.name, 'auto-backport')
+    # Only react to merged PRs for security reasons.
+    # See https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request_target.
+    if: >
+      github.event.pull_request.merged
       && (
-        (github.event.action == 'labeled' && github.event.label.name == 'auto-backport')
-        || (github.event.action == 'closed')
+        github.event.action == 'closed'
+        || (
+          github.event.action == 'labeled'
+          && contains(github.event.label.name, 'backport')
+        )
       )
     steps:
-      - name: Backport Action
-        uses: sqren/backport-github-action@v8.9.2
+      - uses: tibdex/backport@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          auto_backport_label_prefix: backport-to-
+          github_token: ${{ secrets.PAT }}
+          title_template: "<%= title %> [backport <%= number %> to <%= base %>]"
+          labels_template: '["backport"]'
+          body_template: >
+            Backport <%= mergeCommitSha %> from #<%= number %>.
+            ---
+            <%= body %>
 
-      - name: Info log
-        if: ${{ success() }}
-        run: cat /home/runner/.backport/backport.info.log
-        
-      - name: Debug log
-        if: ${{ failure() }}
-        run: cat /home/runner/.backport/backport.debug.log        

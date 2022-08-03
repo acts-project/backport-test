@@ -5,3 +5,4 @@ merge.message.body = "pull_request_body"
 merge.message.cut_body_before = "--- BEGIN COMMIT MESSAGE ---"
 merge.message.cut_body_and_text = true
 merge.method = "squash"
+merge.message.include_coauthors = true
